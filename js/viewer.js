@@ -1,4 +1,3 @@
-// 1. Telegram Integration & Watermark
 const tg = window.Telegram.WebApp;
 tg.expand();
 
@@ -6,7 +5,6 @@ const user = tg.initDataUnsafe?.user || { id: '000000', first_name: 'Student' };
 const watermarkContainer = document.getElementById('watermark-overlay');
 
 function generateWatermark() {
-    // English Watermark per request
     const watermarkString = `Royal Library | ${user.first_name} | ID: ${user.id}   `;
     let html = '';
     for (let i = 0; i < 70; i++) {
@@ -16,7 +14,6 @@ function generateWatermark() {
 }
 generateWatermark();
 
-// 2. File Routing
 const urlParams = new URLSearchParams(window.location.search);
 const requestedFile = urlParams.get('file');
 
@@ -27,7 +24,6 @@ if (!requestedFile) {
 
 const url = `assets/${requestedFile}`; 
 
-// 3. PDF.js Configuration
 const pdfjsLib = window['pdfjs-dist/build/pdf'];
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 
@@ -39,7 +35,6 @@ let pdfDoc = null,
     canvas = document.getElementById('pdf-render'),
     ctx = canvas.getContext('2d');
 
-// 4. Render Logic
 const renderPage = num => {
     pageIsRendering = true;
     pdfDoc.getPage(num).then(page => {
@@ -47,11 +42,9 @@ const renderPage = num => {
         const viewport = page.getViewport({ scale: renderScale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
         canvas.style.width = `${(viewport.width / renderScale) * scale}px`;
 
         const renderCtx = { canvasContext: ctx, viewport: viewport };
-
         page.render(renderCtx).promise.then(() => {
             pageIsRendering = false;
             if (pageNumIsPending !== null) {
@@ -59,7 +52,6 @@ const renderPage = num => {
                 pageNumIsPending = null;
             }
         });
-
         document.getElementById('page-jump-btn').textContent = num;
     });
 };
@@ -69,63 +61,56 @@ const queueRenderPage = num => {
     else renderPage(num);
 };
 
-// 5. Auto-Hide Toolbars
-let hideTimeout;
+// --- UI Tap to Toggle ---
 const toggleBars = () => {
-    document.querySelector('.toolbar').classList.remove('hidden');
-    document.querySelector('.bottom-bar').classList.remove('hidden');
-    clearTimeout(hideTimeout);
-    
-    // Hide after 3 seconds
-    hideTimeout = setTimeout(() => {
-        document.querySelector('.toolbar').classList.add('hidden');
-        document.querySelector('.bottom-bar').classList.add('hidden');
-    }, 3000);
+    document.querySelector('.toolbar').classList.toggle('hidden');
+    document.querySelector('.bottom-bar').classList.toggle('hidden');
 };
-
-// Trigger hide behavior on interaction
+// Tap anywhere on the document container to show/hide
 document.getElementById('pdf-container').addEventListener('click', toggleBars);
-document.getElementById('pdf-container').addEventListener('touchstart', toggleBars);
-toggleBars(); // Initialize on load
 
-// 6. Navigation Controls (Inverted Functions per request)
-// Prev button now goes FORWARD
+// --- Navigation ---
 document.getElementById('prev-page').addEventListener('click', () => {
     if (pageNum >= pdfDoc.numPages) return;
     pageNum++;
     queueRenderPage(pageNum);
-    toggleBars();
 });
 
-// Next button now goes BACKWARD
 document.getElementById('next-page').addEventListener('click', () => {
     if (pageNum <= 1) return;
     pageNum--;
     queueRenderPage(pageNum);
-    toggleBars();
 });
 
-// Jump to specific page
-document.getElementById('page-jump-btn').addEventListener('click', () => {
-    const jump = parseInt(prompt(`أدخل رقم الصفحة (1 - ${pdfDoc.numPages}):`, pageNum));
-    if (jump >= 1 && jump <= pdfDoc.numPages) {
-        pageNum = jump;
-        queueRenderPage(pageNum);
-    }
-    toggleBars();
+// --- Zoom Controls (Select + Buttons) ---
+const updateZoom = (newScale) => {
+    scale = Math.min(Math.max(0.5, newScale), 3.0);
+    document.getElementById('zoom-select').value = scale.toString();
+    queueRenderPage(pageNum);
+};
+
+document.getElementById('zoom-select').addEventListener('change', (e) => {
+    updateZoom(parseFloat(e.target.value));
+});
+document.getElementById('zoom-in').addEventListener('click', () => {
+    updateZoom(scale + 0.25);
+});
+document.getElementById('zoom-out').addEventListener('click', () => {
+    updateZoom(scale - 0.25);
 });
 
-// 7. Touch Gestures (Swipe to Turn, Pinch to Zoom)
+// --- Touch Gestures ---
 let touchStartX = 0;
 let touchEndX = 0;
 let initialDistance = null;
 let initialScale = scale;
+let isPinching = false; // Prevents swipe/pinch mixups
 
 document.getElementById('pdf-container').addEventListener('touchstart', e => {
     if (e.touches.length === 1) {
         touchStartX = e.changedTouches[0].screenX;
     } else if (e.touches.length === 2) {
-        // Start Pinch
+        isPinching = true;
         initialDistance = Math.hypot(
             e.touches[0].pageX - e.touches[1].pageX,
             e.touches[0].pageY - e.touches[1].pageY
@@ -136,51 +121,88 @@ document.getElementById('pdf-container').addEventListener('touchstart', e => {
 
 document.getElementById('pdf-container').addEventListener('touchmove', e => {
     if (e.touches.length === 2 && initialDistance) {
-        e.preventDefault(); // Stop standard scrolling while zooming
+        e.preventDefault(); 
         const currentDistance = Math.hypot(
             e.touches[0].pageX - e.touches[1].pageX,
             e.touches[0].pageY - e.touches[1].pageY
         );
         const zoomFactor = currentDistance / initialDistance;
-        scale = Math.min(Math.max(0.5, initialScale * zoomFactor), 3.0); // Limit min/max zoom
-        
-        // Dynamically update visual width without full re-render for smooth feeling
+        scale = Math.min(Math.max(0.5, initialScale * zoomFactor), 3.0); 
         canvas.style.width = `${(canvas.width / 2.0) * scale}px`;
     }
 });
 
 document.getElementById('pdf-container').addEventListener('touchend', e => {
-    if (e.changedTouches.length === 1 && !initialDistance) {
+    if (e.changedTouches.length === 1 && !isPinching) {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     }
     if (e.touches.length < 2) {
         initialDistance = null; 
-        // Update the select dropdown to 'custom' or closest value after pinch
-        document.getElementById('zoom-select').value = "1.0"; // Reset select visual logic if needed
+        setTimeout(() => { isPinching = false; }, 300); // Debounce pinch
     }
 });
 
 function handleSwipe() {
-    const swipeThreshold = 50;
+    const swipeThreshold = 60;
     if (touchEndX < touchStartX - swipeThreshold) { 
-        // Swiped Left - Go Forward
         if (pageNum < pdfDoc.numPages) { pageNum++; queueRenderPage(pageNum); }
     }
     if (touchEndX > touchStartX + swipeThreshold) { 
-        // Swiped Right - Go Backward
         if (pageNum > 1) { pageNum--; queueRenderPage(pageNum); }
     }
 }
 
-// 8. Fixed Zoom Dropdown Logic
-document.getElementById('zoom-select').addEventListener('change', (e) => {
-    scale = parseFloat(e.target.value);
-    queueRenderPage(pageNum);
-    toggleBars();
+// --- Thumbnail Engine ---
+let thumbnailsGenerated = false;
+
+const generateThumbnails = async () => {
+    const grid = document.getElementById('thumbnail-grid');
+    grid.innerHTML = '<span style="color: white; padding: 20px;">جاري تحميل الصفحات...</span>';
+    
+    for (let i = 1; i <= pdfDoc.numPages; i++) {
+        if(i === 1) grid.innerHTML = ''; // clear loading text
+        
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale: 0.3 }); // Small scale for thumbnails
+        
+        const thumbCanvas = document.createElement('canvas');
+        const thumbCtx = thumbCanvas.getContext('2d');
+        thumbCanvas.height = viewport.height;
+        thumbCanvas.width = viewport.width;
+        
+        await page.render({ canvasContext: thumbCtx, viewport: viewport }).promise;
+
+        const thumbItem = document.createElement('div');
+        thumbItem.className = 'thumbnail-item';
+        thumbItem.innerHTML = `<span>صفحة ${i}</span>`;
+        thumbItem.insertBefore(thumbCanvas, thumbItem.firstChild);
+        
+        thumbItem.onclick = () => {
+            pageNum = i;
+            queueRenderPage(pageNum);
+            document.getElementById('thumbnail-modal').classList.add('hidden');
+            // Hide bars when returning to document
+            document.querySelector('.toolbar').classList.add('hidden');
+            document.querySelector('.bottom-bar').classList.add('hidden');
+        };
+        
+        grid.appendChild(thumbItem);
+    }
+    thumbnailsGenerated = true;
+};
+
+document.getElementById('page-jump-btn').addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevents the container tap event from firing
+    document.getElementById('thumbnail-modal').classList.remove('hidden');
+    if (!thumbnailsGenerated) generateThumbnails();
 });
 
-// 9. Load Document
+document.getElementById('close-thumbnails').addEventListener('click', () => {
+    document.getElementById('thumbnail-modal').classList.add('hidden');
+});
+
+// --- Init Document ---
 pdfjsLib.getDocument({ url: url }).promise.then(pdfDoc_ => {
     pdfDoc = pdfDoc_;
     document.getElementById('page-count').textContent = pdfDoc.numPages;
@@ -190,16 +212,8 @@ pdfjsLib.getDocument({ url: url }).promise.then(pdfDoc_ => {
     alert("حدث خطأ أثناء تحميل الملف.");
 });
 
-// 10. Security Measures
+// Security
 document.addEventListener('contextmenu', event => event.preventDefault());
-
 document.onkeydown = function(e) {
-    if(e.keyCode == 123 || 
-      (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || 
-      (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) || 
-      (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) || 
-      (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) || 
-      (e.ctrlKey && e.keyCode == 'P'.charCodeAt(0))) { 
-        return false;
-    }
+    if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) || (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'P'.charCodeAt(0))) { return false; }
 };
