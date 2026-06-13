@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -9,31 +9,26 @@
 </head>
 <body class="menu-body">
     <div class="menu-container">
-        <img src="assets/logos/Artboard 51.svg" alt="Royal Library Logo" class="main-logo">
+        <img src="assets/logos/Artboard 51.svg" alt="Royal Library" class="main-logo">
         
         <h2>السنة الأولى</h2>
         <div class="subject-grid">
-            <a href="viewer.html?file=year1/subject1.pdf" class="subject-btn">ملخص المادة 1</a>
-            <a href="viewer.html?file=year1/subject2.pdf" class="subject-btn">ملخص المادة 2</a>
+            <div class="subject-btn" onclick="openViewer('year1/subject1.pdf')">ملخص المادة 1</div>
+            <div class="subject-btn" onclick="openViewer('year1/subject2.pdf')">ملخص المادة 2</div>
         </div>
 
         <h2>السنة الثانية</h2>
         <div class="subject-grid">
-            <a href="viewer.html?file=year2/subject1.pdf" class="subject-btn">ملخص المادة 1</a>
-            <a href="viewer.html?file=year2/subject2.pdf" class="subject-btn">ملخص المادة 2</a>
-        </div>
-
-        <h2>السنة الثالثة</h2>
-        <div class="subject-grid">
-            <a href="viewer.html?file=year3/subject1.pdf" class="subject-btn">ملخص المادة 1</a>
-            <a href="viewer.html?file=year3/subject2.pdf" class="subject-btn">ملخص المادة 2</a>
-        </div>
-
-        <h2>السنة الرابعة</h2>
-        <div class="subject-grid">
-            <a href="viewer.html?file=year4/subject1.pdf" class="subject-btn">ملخص المادة 1</a>
-            <a href="viewer.html?file=year4/subject2.pdf" class="subject-btn">ملخص المادة 2</a>
+            <div class="subject-btn" onclick="openViewer('year2/subject1.pdf')">ملخص المادة 1</div>
+            <div class="subject-btn" onclick="openViewer('year2/subject2.pdf')">ملخص المادة 2</div>
         </div>
     </div>
+
+    <script>
+        // Secure navigation script
+        function openViewer(filePath) {
+            window.location.href = `viewer.html?file=${filePath}`;
+        }
+    </script>
 </body>
 </html>
