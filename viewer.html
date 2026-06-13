@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مكتبة رويال - العارض</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="viewer-body">
+    <div id="watermark-overlay"></div>
+
+    <header class="toolbar">
+        <div class="branding">
+            <img src="assets/logos/Artboard 45.svg" alt="Icon" class="toolbar-icon">
+            <span>مكتبة رويال</span>
+        </div>
+        <div class="controls">
+            <button id="zoom-out">-</button>
+            <span id="zoom-level" dir="ltr">100%</span>
+            <button id="zoom-in">+</button>
+        </div>
+    </header>
+
+    <main id="pdf-container">
+        <canvas id="pdf-render"></canvas>
+    </main>
+
+    <footer class="bottom-bar">
+        <button id="prev-page">السابق</button>
+        <span class="page-info">
+            صفحة <span id="page-num">1</span> من <span id="page-count">--</span>
+        </span>
+        <button id="next-page">التالي</button>
+    </footer>
+
+    <script src="js/viewer.js"></script>
+</body>
+</html>
