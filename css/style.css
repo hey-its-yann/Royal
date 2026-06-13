@@ -1,17 +1,17 @@
+/* ... Keep all your existing root and basic styles up to .viewer-body ... */
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
 
 :root {
     --gold: #E89C31;
     --purple: #4A2E63;
     --onyx: #1a1a1a;
-    --glass-bg: rgba(74, 46, 99, 0.85); /* Transparent Purple */
+    --light-bg: #f4f4f4;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Absolute block on long-press selection & callouts */
     user-select: none; 
     -webkit-user-select: none;
     -webkit-touch-callout: none;
@@ -19,138 +19,79 @@
 }
 
 /* ----- Menu Styles ----- */
-.menu-body {
-    background-color: var(--onyx);
-    color: white;
-    min-height: 100vh;
-    padding: 40px 20px;
-    display: flex;
-    justify-content: center;
-}
-
-.menu-container {
-    max-width: 600px;
-    width: 100%;
-    text-align: center;
-}
-
-.main-logo {
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    object-fit: contain;
-    margin: 0 auto 40px auto; 
-    display: block;
-}
-
-.menu-container h2 {
-    color: var(--gold);
-    margin: 30px 0 15px;
-    border-bottom: 2px solid var(--purple);
-    padding-bottom: 8px;
-}
-
-.subject-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.subject-btn {
-    background-color: var(--purple);
-    color: white;
-    padding: 18px;
-    border-radius: 12px; /* Modern rounded corners */
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-.subject-btn:active {
-    background-color: var(--gold);
-    color: var(--onyx);
-    transform: scale(0.96);
-}
+.menu-body { background-color: var(--onyx); color: white; min-height: 100vh; padding: 30px 20px; display: flex; justify-content: center; }
+.menu-container { max-width: 600px; width: 100%; text-align: center; }
+.main-logo { width: 220px; margin-bottom: 40px; }
+.menu-container h2 { color: var(--gold); margin: 30px 0 15px; border-bottom: 2px solid var(--purple); padding-bottom: 8px; }
+.subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.subject-btn { background-color: var(--purple); color: white; padding: 15px; border-radius: 8px; text-decoration: none; font-weight: 700; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+.subject-btn:active { background-color: var(--gold); color: var(--onyx); transform: scale(0.98); }
 
 /* ----- Viewer Styles ----- */
 .viewer-body {
-    background-color: #222;
+    background-color: var(--onyx);
     color: white;
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden; 
+    position: relative; /* Needed for fixed toolbars */
 }
 
-/* Glassmorphism Toolbars */
-.glass-toolbar {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 10px 20px;
+@media print { body { display: none !important; } }
+
+#watermark-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; overflow: hidden; opacity: 0.12; }
+.watermark-text { font-size: 16px; font-weight: 700; color: var(--onyx); transform: rotate(-45deg); white-space: nowrap; margin: 35px; text-shadow: 1px 1px 0 #fff; }
+
+/* Fixed & Auto-Hide Toolbars (Floating Style) */
+.hide-able {
+    position: fixed;
+    /* Create gaps on the left and right instead of width: 100% */
+    left: 12px;
+    right: 12px; 
+    transition: transform 0.3s ease-in-out;
+    background-color: var(--purple);
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 100;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    position: fixed;
-    width: 100%;
-    left: 0;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6); /* Slightly stronger shadow for depth */
 }
 
-.top-bar { top: 0; }
-.bottom-bar { bottom: 0; }
-
-.branding .toolbar-icon {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
+.toolbar { 
+    top: 12px; /* Gap from the top */
+    border-radius: 20px; /* Rounded corners */
 }
 
-/* Icon Buttons */
-.icon-btn {
-    background: transparent;
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
+.bottom-bar { 
+    bottom: 12px; /* Gap from the bottom */
+    border-radius: 30px; /* More pill-shaped, similar to the chat input in your image */
 }
 
-.icon-btn:active {
-    background: rgba(255,255,255,0.2);
-    transform: scale(0.9);
-}
+/* Ensure they slide completely off-screen including the 12px gap */
+.toolbar.hidden { transform: translateY(calc(-100% - 20px)); }
+.bottom-bar.hidden { transform: translateY(calc(100% + 20px)); }
 
-.icon-btn.highlight {
+/* New Select & Page Button Styles */
+#zoom-select {
     background-color: var(--gold);
     color: var(--onyx);
-}
-
-.nav-controls, .zoom-controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.page-indicator {
+    border: none;
+    padding: 8px 10px;
+    border-radius: 6px;
     font-weight: 700;
-    background: rgba(0,0,0,0.3);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+    font-family: 'Cairo', sans-serif;
+    cursor: pointer;
+    outline: none;
 }
 
-#zoom-level {
-    font-weight: 600;
-    font-size: 0.9rem;
-    min-width: 45px;
-    text-align: center;
+.page-btn {
+    background-color: transparent;
+    color: var(--gold);
+    padding: 0 5px;
+    font-size: 1rem;
+    text-decoration: underline;
 }
 
 #pdf-container {
@@ -159,26 +100,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #1a1a1a;
-    padding: 70px 0; /* Space for fixed toolbars */
+    background-color: #2a2a2a;
+    height: 100vh; /* Fill entire screen */
 }
 
 #pdf-render {
-    transition: transform 0.2s ease-out;
-    transform-origin: center center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-}
-
-/* Watermark */
-#watermark-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    pointer-events: none; z-index: 9999;
-    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
-    overflow: hidden; opacity: 0.12; 
-}
-
-.watermark-text {
-    font-size: 16px; font-weight: 700; color: var(--gold);
-    transform: rotate(-45deg); white-space: nowrap; margin: 40px; text-shadow: 1px 1px 0 #000;
+    transition: transform 0.1s ease-out; /* Faster for pinch-to-zoom */
+    transform-origin: center top;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    margin-top: 60px; /* Buffer for the top bar */
+    margin-bottom: 60px; /* Buffer for the bottom bar */
 }
