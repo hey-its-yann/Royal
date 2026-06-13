@@ -6,6 +6,7 @@
     <title>مكتبة رويال - العارض</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="viewer-body">
@@ -13,9 +14,11 @@
 
     <header class="toolbar hide-able">
         <div class="branding">
-            <span>مكتبة رويال</span>
+            <a href="index.html" class="icon-btn"><span class="material-symbols-outlined">home</span></a>
+            <span class="en-title" dir="ltr">Royal Library</span>
         </div>
         <div class="controls">
+            <button id="zoom-out" class="icon-btn"><span class="material-symbols-outlined">remove</span></button>
             <select id="zoom-select" dir="ltr">
                 <option value="0.5">50%</option>
                 <option value="0.75">75%</option>
@@ -24,6 +27,7 @@
                 <option value="1.5">150%</option>
                 <option value="2.0">200%</option>
             </select>
+            <button id="zoom-in" class="icon-btn"><span class="material-symbols-outlined">add</span></button>
         </div>
     </header>
 
@@ -32,12 +36,20 @@
     </main>
 
     <footer class="bottom-bar hide-able">
-        <button id="prev-page">السابق</button>
+        <button id="next-page" class="icon-btn"><span class="material-symbols-outlined">arrow_forward_ios</span></button>
         <span class="page-info">
             صفحة <button id="page-jump-btn" class="page-btn">1</button> من <span id="page-count">--</span>
         </span>
-        <button id="next-page">التالي</button>
+        <button id="prev-page" class="icon-btn"><span class="material-symbols-outlined">arrow_back_ios</span></button>
     </footer>
+
+    <div id="thumbnail-modal" class="hidden">
+        <div class="modal-header">
+            <h3>اختر الصفحة</h3>
+            <button id="close-thumbnails" class="icon-btn"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div id="thumbnail-grid"></div>
+    </div>
 
     <script src="js/viewer.js"></script>
 </body>
