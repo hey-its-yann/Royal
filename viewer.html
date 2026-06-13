@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>مكتبة رويال - العارض</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
@@ -12,40 +11,32 @@
 <body class="viewer-body">
     <div id="watermark-overlay"></div>
 
-    <header class="glass-toolbar top-bar">
-        <button class="icon-btn" onclick="window.location.href='index.html'" title="الرئيسية">
-            <span class="material-symbols-outlined">home</span>
-        </button>
+    <header class="toolbar hide-able">
         <div class="branding">
-            <img src="assets/logos/Artboard 51.svg" alt="Icon" class="toolbar-icon">
+            <span>مكتبة رويال</span>
         </div>
-        <button class="icon-btn" id="fullscreen-btn" title="ملء الشاشة">
-            <span class="material-symbols-outlined">fullscreen</span>
-        </button>
+        <div class="controls">
+            <select id="zoom-select" dir="ltr">
+                <option value="0.5">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1.0" selected>100%</option>
+                <option value="1.25">125%</option>
+                <option value="1.5">150%</option>
+                <option value="2.0">200%</option>
+            </select>
+        </div>
     </header>
 
     <main id="pdf-container">
         <canvas id="pdf-render"></canvas>
     </main>
 
-    <footer class="glass-toolbar bottom-bar">
-        <div class="nav-controls">
-            <button class="icon-btn highlight" id="next-page" title="التالي">
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-            <div class="page-indicator">
-                <span id="page-num">1</span> / <span id="page-count">--</span>
-            </div>
-            <button class="icon-btn highlight" id="prev-page" title="السابق">
-                <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-        </div>
-
-        <div class="zoom-controls">
-            <button class="icon-btn" id="zoom-in"><span class="material-symbols-outlined">zoom_in</span></button>
-            <span id="zoom-level" dir="ltr">100%</span>
-            <button class="icon-btn" id="zoom-out"><span class="material-symbols-outlined">zoom_out</span></button>
-        </div>
+    <footer class="bottom-bar hide-able">
+        <button id="prev-page">السابق</button>
+        <span class="page-info">
+            صفحة <button id="page-jump-btn" class="page-btn">1</button> من <span id="page-count">--</span>
+        </span>
+        <button id="next-page">التالي</button>
     </footer>
 
     <script src="js/viewer.js"></script>
